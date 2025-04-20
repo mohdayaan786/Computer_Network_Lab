@@ -1,0 +1,522 @@
+# Implementing BFS and DFS
+'''
+from collections import deque 
+ 
+graph = { 
+    'A': ['B', 'C'], 
+    'B': ['D', 'E'], 
+    'C': ['F'], 
+    'D': [], 'E': [], 'F': [] 
+} 
+ 
+def dfs(start, visited=set()): 
+    if start not in visited: 
+        print(start, end=' ') 
+        visited.add(start) 
+        for neighbor in graph[start]: 
+            dfs(neighbor, visited) 
+ 
+def bfs(start): 
+    visited = set() 
+    queue = deque([start]) 
+    while queue: 
+        node = queue.popleft() 
+        if node not in visited: 
+            print(node, end=' ') 
+            visited.add(node) 
+            queue.extend(graph[node]) 
+ 
+print("DFS:") 
+dfs('A') 
+print("\nBFS:") 
+bfs('A') 
+'''
+
+# Travelling SalesMan Problem
+'''
+from itertools import permutations 
+ 
+dist = { 
+    ('A', 'B'): 10, ('A', 'C'): 15, ('A', 'D'): 20, 
+    ('B', 'A'): 10, ('B', 'C'): 35, ('B', 'D'): 25, 
+    ('C', 'A'): 15, ('C', 'B'): 35, ('C', 'D'): 30, 
+    ('D', 'A'): 20, ('D', 'B'): 25, ('D', 'C'): 30 
+} 
+cities = ['A', 'B', 'C', 'D'] 
+min_path = float('inf') 
+ 
+for perm in permutations(cities[1:]): 
+    path = ['A'] + list(perm) + ['A'] 
+    cost = sum(dist[(path[i], path[i+1])] for i in range(len(path)-1)) 
+    if cost < min_path: 
+        min_path = cost 
+        best_path = path 
+ 
+print("Best Path:", best_path, "Cost:", min_path) 
+'''
+
+# Simulated Annealing Algo
+
+'''
+
+import math, random 
+ 
+def cost(x): return x**2 + 4*x + 4 
+ 
+def simulated_annealing(): 
+    x = random.uniform(-10, 10) 
+    T = 1000 
+    cooling = 0.95 
+    while T > 1e-3: 
+        new_x = x + random.uniform(-1, 1) 
+        delta = cost(new_x) - cost(x) 
+        if delta < 0 or random.random() < math.exp(-delta / T): 
+            x = new_x 
+        T *= cooling 
+    return x, cost(x) 
+ 
+solution, val = simulated_annealing() 
+print("Minimum at x =", round(solution, 2), "Value =", round(val, 2))
+'''
+
+# Wumpus World Problem
+'''
+world = [['', 'W', '', 'G'], 
+         ['P', '', 'P', ''], 
+         ['', 'B', '', ''], 
+         ['A', '', '', '']] 
+ 
+agent_pos = (3, 0) 
+safe = set([agent_pos]) 
+moves = [(0,1),(1,0),(-1,0),(0,-1)] 
+ 
+def get_safe_moves(pos): 
+    x, y = pos 
+    possible = [] 
+    for dx, dy in moves: 
+        nx, ny = x+dx, y+dy 
+        if 0<=nx<4 and 0<=ny<4 and world[nx][ny] not in ['W', 'P']: 
+            possible.append((nx, ny)) 
+    return possible 
+ 
+path = [] 
+def dfs(pos): 
+    path.append(pos) 
+    if world[pos[0]][pos[1]] == 'G': 
+        return True 
+    for move in get_safe_moves(pos): 
+        if move not in path: 
+            if dfs(move): 
+                return True 
+    path.pop() 
+    return False 
+ 
+dfs(agent_pos) 
+print("Path to gold:", path)
+'''
+
+# 8 puzzle problem
+
+'''
+from collections import deque
+
+goal = '12345678_'
+
+def bfs(start):
+    moves = [(-3, 3, -1, 1)]
+    q = deque([(start, [])])
+    seen = {start}
+    while q:
+        s, p = q.popleft()
+        if s == goal: return p + [s]
+        i = s.index('_')
+        for d in (-3, 3, -1, 1):
+            j = i + d
+            if 0 <= j < 9 and not (i%3==2 and d==1) and not (i%3==0 and d==-1):
+                lst = list(s)
+                lst[i], lst[j] = lst[j], lst[i]
+                n = ''.join(lst)
+                if n not in seen:
+                    seen.add(n)
+                    q.append((n, p + [s]))
+
+def solvable(s):
+    a = [c for c in s if c != '_']
+    return sum(a[i] > a[j] for i in range(len(a)) for j in range(i+1,len(a))) % 2 == 0
+
+start = '1245_6387'
+
+if solvable(start):
+    sol = bfs(start)
+    if sol:
+        print(f"Steps: {len(sol)-1}")
+        for s in sol:
+            print(s[:3], s[3:6], s[6:])
+    else:
+        print("No solution.")
+else:
+    print("Unsolvable.")
+'''
+
+# 8 queen problem
+
+'''
+def is_safe(board, row, col): 
+    for i in range(row): 
+        if board[i] == col or \
+           abs(board[i] - col) == abs(i - row): 
+            return False 
+    return True 
+ 
+def solve(row=0, board=[]): 
+    if row == 8: 
+        print(board) 
+        return 
+    for col in range(8): 
+        if is_safe(board, row, col): 
+            solve(row + 1, board + [col]) 
+ 
+solve()
+'''
+
+# Tower of Hanoi
+'''
+def hanoi(n, src, aux, dest): 
+    if n == 1: 
+        print(f"Move disk 1 from {src} to {dest}") 
+        return 
+    hanoi(n-1, src, dest, aux) 
+    print(f"Move disk {n} from {src} to {dest}") 
+    hanoi(n-1, aux, src, dest) 
+ 
+hanoi(3, 'A', 'B', 'C')
+'''
+
+# A* algorithm
+'''
+import heapq 
+ 
+graph = { 
+    'A': [('B', 1), ('C', 3)], 
+    'B': [('D', 3)], 
+    'C': [('D', 1)], 
+    'D': [] 
+} 
+heuristic = {'A': 4, 'B': 2, 'C': 2, 'D': 0} 
+ 
+def astar(start, goal): 
+    pq = [(heuristic[start], 0, start, [])] 
+    while pq: 
+        f, g, node, path = heapq.heappop(pq) 
+        path = path + [node] 
+        if node == goal: 
+            return path 
+        for neighbor, cost in graph[node]: 
+            heapq.heappush(pq, (g+cost+heuristic[neighbor], g+cost, neighbor, path)) 
+ 
+print("A* Path:", astar('A', 'D'))
+'''
+
+# Hill climbing algorithm
+
+'''
+import random 
+ 
+def objective(x): return -(x**2) + 10 
+ 
+def hill_climb(): 
+    x = random.uniform(-10, 10) 
+    step = 0.1 
+    while True: 
+        neighbors = [x + step, x - step] 
+        next_x = max(neighbors, key=objective) 
+        if objective(next_x) <= objective(x): 
+            break 
+        x = next_x 
+    return x, objective(x) 
+ 
+x, val = hill_climb() 
+print("Best x:", round(x, 2), "Value:", round(val, 2))
+'''
+
+# MiniMax Algorithm (Tic Tac Toe example)
+'''
+def minimax(board, depth, is_max): 
+    scores = {'X': -1, 'O': 1, 'Tie': 0} 
+    result = check_winner(board) 
+    if result: 
+        return scores[result] 
+ 
+    if is_max: 
+        best = -float('inf') 
+        for i in range(9): 
+            if board[i] == ' ': 
+                board[i] = 'O' 
+                best = max(best, minimax(board, depth+1, False)) 
+                board[i] = ' ' 
+        return best 
+    else: 
+        best = float('inf') 
+        for i in range(9): 
+            if board[i] == ' ': 
+                board[i] = 'X' 
+                best = min(best, minimax(board, depth+1, True)) 
+                board[i] = ' ' 
+        return best 
+ 
+def check_winner(board): 
+    combos = [(0,1,2),(3,4,5),(6,7,8), 
+              (0,3,6),(1,4,7),(2,5,8), 
+              (0,4,8),(2,4,6)] 
+    for a,b,c in combos: 
+        if board[a] == board[b] == board[c] != ' ': 
+            return board[a] 
+    if ' ' not in board: 
+        return 'Tie' 
+    return None 
+ 
+# Usage Example 
+board = ['X', 'O', 'X', 
+         ' ', 'O', ' ', 
+         ' ', ' ', 'X'] 
+print("Minimax Score:", minimax(board, 0, True))
+'''
+
+# Alpha Beta pruning
+'''
+def alphabeta(depth, nodeIndex, isMax, values, alpha, beta): 
+    if depth == 3: 
+        return values[nodeIndex] 
+ 
+    if isMax: 
+        best = -float('inf') 
+        for i in range(2): 
+            val = alphabeta(depth+1, nodeIndex*2+i, False, values, alpha, beta) 
+            best = max(best, val) 
+            alpha = max(alpha, best) 
+            if beta <= alpha: 
+                break 
+        return best 
+    else: 
+        best = float('inf') 
+        for i in range(2): 
+            val = alphabeta(depth+1, nodeIndex*2+i, True, values, alpha, beta) 
+            best = min(best, val) 
+            beta = min(beta, best) 
+            if beta <= alpha: 
+                break 
+        return best 
+ 
+values = [3, 5, 6, 9, 1, 2, 0, -1] 
+print("Optimal value:", alphabeta(0, 0, True, values, -float('inf'), float('inf')))
+'''
+
+# Tic tac toe game
+'''
+def print_board(board): 
+    for i in range(0, 9, 3): 
+        print(board[i:i+3]) 
+ 
+def check(board): 
+    lines = [(0,1,2),(3,4,5),(6,7,8),(0,3,6),(1,4,7),(2,5,8),(0,4,8),(2,4,6)] 
+    for a,b,c in lines: 
+        if board[a] == board[b] == board[c] != ' ': 
+            return board[a] 
+    if ' ' not in board: 
+        return 'Tie' 
+    return None 
+ 
+board = [' '] * 9 
+turn = 'X' 
+ 
+while True: 
+    print_board(board) 
+    move = int(input(f"{turn}'s turn (0-8): ")) 
+    if board[move] == ' ': 
+        board[move] = turn 
+        winner = check(board) 
+        if winner: 
+            print_board(board) 
+            print("Winner:", winner) 
+            break 
+        turn = 'O' if turn == 'X' else 'X'
+
+'''
+
+# Water Jug Problem
+'''
+
+from collections import deque 
+ 
+def water_jug(x, y, target): 
+    visited = set() 
+    queue = deque() 
+    queue.append((0, 0)) 
+ 
+    while queue: 
+        a, b = queue.popleft() 
+        if (a, b) in visited: 
+            continue 
+        visited.add((a, b)) 
+        print(f"Jug1: {a}, Jug2: {b}") 
+        if a == target or b == target: 
+            break 
+        queue.extend([ 
+            (x, b), (a, y), (0, b), (a, 0), 
+            (min(a + b, x), b - (min(a + b, x) - a)) if b > 0 else (a, b), 
+            (a - (min(a + b, y) - b), min(a + b, y)) if a > 0 else (a, b) 
+        ]) 
+ 
+water_jug(4, 3, 2) 
+
+'''
+
+# Monkey Banana Problem
+'''
+
+def monkey_banana(): 
+    state = { 
+        'monkey': 'floor', 
+        'box': 'center', 
+        'monkey_pos': 'A', 
+        'banana': 'center', 
+        'has_banana': False 
+    } 
+ 
+    actions = [] 
+    if state['monkey_pos'] != state['box']: 
+        actions.append("Monkey moves to box") 
+        state['monkey_pos'] = state['box'] 
+    if state['monkey'] == 'floor': 
+        actions.append("Monkey pushes box to banana") 
+        state['box'] = state['banana'] 
+        state['monkey_pos'] = 'center' 
+        actions.append("Monkey climbs box") 
+        state['monkey'] = 'box' 
+    if state['box'] == state['banana']: 
+        actions.append("Monkey grabs banana") 
+        state['has_banana'] = True 
+ 
+    for act in actions: 
+        print(act) 
+    print("Banana acquired:", state['has_banana']) 
+ 
+monkey_banana()
+'''
+
+# Block World Problem
+'''
+def block_world(start, goal):
+    moves = []
+    while start != goal:
+        # Find the first mismatch
+        for i in range(len(start)):
+            if start[i] != goal[i]:
+                # Move top block from stack i
+                if start[i]:
+                    block = start[i].pop()
+                    # Find where this block should go
+                    for j in range(len(start)):
+                        if j != i:
+                            # Only move to stack where goal expects it
+                            if not start[j] or (goal[j] and block == goal[j][len(start[j])]):
+                                start[j].append(block)
+                                moves.append(f"Move {block} from Stack {i+1} to Stack {j+1}")
+                                break
+                    break
+    for m in moves:
+        print(m)
+
+start_state = [['A', 'B'], ['C'], []]
+goal_state = [[], [], ['A', 'B', 'C']]
+block_world(start_state, goal_state)
+'''
+
+# Constraint Satisfaction Problems (CSP)
+'''
+
+colors = ['Red', 'Green', 'Blue'] 
+neighbors = { 
+    'WA': ['NT', 'SA'], 
+    'NT': ['WA', 'SA', 'Q'], 
+    'SA': ['WA', 'NT', 'Q', 'NSW', 'V'], 
+    'Q': ['NT', 'SA', 'NSW'], 
+    'NSW': ['Q', 'SA', 'V'], 
+    'V': ['SA', 'NSW'], 
+    'T': [] 
+} 
+assignment = {} 
+ 
+def is_valid(state, var, value): 
+    for neighbor in neighbors[var]: 
+        if neighbor in state and state[neighbor] == value: 
+            return False 
+    return True 
+ 
+def backtrack(state): 
+    if len(state) == len(neighbors): 
+        return state 
+    var = [v for v in neighbors if v not in state][0] 
+    for value in colors: 
+        if is_valid(state, var, value): 
+            new_state = state.copy() 
+            new_state[var] = value 
+            result = backtrack(new_state) 
+            if result: 
+                return result 
+    return None 
+ 
+print(backtrack({}))
+'''
+
+# Expert System case study (Flu Diagnosis)
+'''
+
+def flu_diagnosis(symptoms): 
+    rules = [ 
+        ({"fever", "cough", "body ache"}, "You may have flu."), 
+        ({"fever", "rash"}, "You may have measles."), 
+        ({"cough"}, "You might have a common cold.") 
+    ] 
+    for cond, diag in rules: 
+        if cond.issubset(symptoms): 
+            return diag 
+    return "No clear diagnosis." 
+ 
+# Example 
+symptoms = {"fever", "cough", "body ache"} 
+print(flu_diagnosis(symptoms))
+'''
+
+# Unification and Resolution in Real world problem
+'''
+
+def unify(x, y, subs={}): 
+    if x == y: 
+        return subs 
+    if isinstance(x, str) and x.islower(): 
+        return unify_var(x, y, subs) 
+    if isinstance(y, str) and y.islower(): 
+        return unify_var(y, x, subs) 
+    if isinstance(x, tuple) and isinstance(y, tuple) and x[0] == y[0]: 
+        for a, b in zip(x[1:], y[1:]): 
+            subs = unify(a, b, subs) 
+            if subs is None: 
+                return None 
+        return subs 
+    return None 
+ 
+def unify_var(var, x, subs): 
+    if var in subs: 
+        return unify(subs[var], x, subs) 
+    elif x in subs: 
+        return unify(var, subs[x], subs) 
+    else: 
+        subs[var] = x 
+        return subs 
+ 
+# Example 
+x = ('knows', 'john', 'X') 
+y = ('knows', 'john', 'mary') 
+print("Unification result:", unify(x, y))
+'''
